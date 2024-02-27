@@ -1,5 +1,5 @@
 "use client";
-import { PATHS, QP } from "@/constants/routes";
+import { PATHS } from "@/constants/routes";
 import { RoomsTypes, UsersTypes } from "@/globle";
 import { useAllUsers } from "@/hooks/useAllUsers";
 import useChatRoom from "@/hooks/useChatRoom";
@@ -17,18 +17,18 @@ const ChatList = () => {
   const handleUserClick = (user: UsersTypes) => {
     const roomUsers = [user.userName, currentUser.userName].sort();
     const chatRoom: RoomsTypes = {
+      roomId: roomUsers.join(""),
       roomUsers,
       user1: user,
       user2: currentUser,
     };
 
     const existingRoom = allRooms.filter(
-      (existing: RoomsTypes) =>
-        existing.roomUsers.join("") === chatRoom.roomUsers.join("")
+      (existing: RoomsTypes) => existing.roomId === chatRoom.roomId
     );
 
     if (existingRoom.length >= 1) {
-      const param = existingRoom[0].roomUsers.join("");
+      const param = existingRoom[0].roomId;
       router.push(`${PATHS.chat}/${param}`);
     } else {
       localStorage.setItem(
@@ -36,7 +36,7 @@ const ChatList = () => {
         JSON.stringify([...allRooms, chatRoom])
       );
       setAllRooms((prev: RoomsTypes[]) => [...prev, chatRoom]);
-      const param = chatRoom.roomUsers.join("");
+      const param = chatRoom.roomId;
       router.push(`${PATHS.chat}/${param}`);
     }
   };

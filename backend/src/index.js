@@ -20,17 +20,26 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
   console.log("A user Connected", socket.id);
 
-  // for messaging ---
   socket.on("send-message", (message) => {
-    // Corrected the event name
-    console.log("message: ", message);
-
-    io.emit("get-message", message); // Corrected the event name
+    console.log(message);
+    socket.to(message.roomId).emit("get-message", message);
   });
 
-  // for typing ---
-  socket.on("set-typing", (isTyping) => {
-    io.emit("get-typing", isTyping);
+  // join room ---
+  socket.on("join-room", (room) => {
+    socket.join(room.roomId);
+    console.log(`${room.currentUser.name} joined room ${room.roomId}`);
+  });
+
+  // is online ---
+  socket.on("set-is-online", (online) => {
+    console.log(`${online.roomId} is Online.`);
+    socket.to(online.roomId).emit("get-is-online", online);
+  });
+
+  // typing ---
+  socket.on("set-typing", (typing) => {
+    socket.to(typing.roomId).emit("get-typing", typing);
   });
 
   socket.on("disconnect", () => {
