@@ -1,13 +1,11 @@
 "use client";
-import { UsersTypes } from "@/globle";
-import { useAllUsers } from "@/hooks/useAllUsers";
+import { handleLogin } from "@/api/Api";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { Button, Grid, TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 const Login = () => {
-  const { allUsers } = useAllUsers();
   const { setCurrentUser } = useCurrentUser();
   const [error, setError] = useState("");
   const [userName, setUserName] = useState("");
@@ -16,20 +14,17 @@ const Login = () => {
 
   const handleSubmitUser = (e: React.FormEvent) => {
     e.preventDefault();
-    const existingUser = allUsers.filter(
-      (existingUser: UsersTypes) =>
-        existingUser.userName?.toLowerCase() === userName.toLowerCase() &&
-        existingUser.password === password
-    );
-    if (existingUser.length >= 1) {
-      router.push("/chat", { scroll: false });
-      setCurrentUser(existingUser[0]);
-      localStorage.setItem("currentUser", JSON.stringify(existingUser[0]));
-      setUserName("");
-      setPassword("");
-    } else {
-      setError("Wrong Credential!");
-    }
+    handleLogin({ userName, password }).then((user) => {
+      if (user.status) {
+        router.push("/chat", { scroll: false });
+        setCurrentUser(user.user);
+        localStorage.setItem("currentUser", JSON.stringify(user.user));
+        setUserName("");
+        setPassword("");
+      } else {
+        setError(user.message);
+      }
+    });
   };
 
   return (

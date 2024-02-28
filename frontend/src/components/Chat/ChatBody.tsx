@@ -45,9 +45,10 @@ const ChatBody = forwardRef<
               </Typography>
               <Grid
                 p={1.6}
+                pl={1}
                 pr={3}
                 pt={0}
-                minWidth={60}
+                minWidth={70}
                 maxWidth={"40%"}
                 borderRadius={"8px"}
                 position={"relative"}

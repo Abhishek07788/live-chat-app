@@ -1,13 +1,12 @@
 "use client";
+import { handleSignUp } from "@/api/Api";
 import { UsersTypes } from "@/globle";
-import { useAllUsers } from "@/hooks/useAllUsers";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { Button, Grid, TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 const Signup = () => {
-  const { allUsers } = useAllUsers();
   const { setCurrentUser } = useCurrentUser();
   const [error, setError] = useState("");
   const [name, setName] = useState("");
@@ -26,21 +25,19 @@ const Signup = () => {
       return;
     }
     const user: UsersTypes = { name, userName, password };
-    const isUserExist = allUsers.some(
-      (existingUser: UsersTypes) =>
-        existingUser.userName?.toLowerCase() === userName.toLowerCase()
-    );
-    if (isUserExist) {
-      setError("User Already Exist!");
-    } else {
-      localStorage.setItem("users", JSON.stringify([...allUsers, user]));
-      localStorage.setItem("currentUser", JSON.stringify(user));
-      setCurrentUser(user);
-      router.push("/chat", { scroll: false });
-      setName("");
-      setPassword("");
-      setUserName("");
-    }
+    handleSignUp(user).then((singleUser) => {
+      console.log("singleUser: ", singleUser);
+      if (singleUser.status) {
+        localStorage.setItem("currentUser", JSON.stringify(singleUser));
+        setCurrentUser(singleUser);
+        router.push("/chat", { scroll: false });
+        setName("");
+        setPassword("");
+        setUserName("");
+      } else {
+        setError(singleUser.message);
+      }
+    });
   };
 
   return (

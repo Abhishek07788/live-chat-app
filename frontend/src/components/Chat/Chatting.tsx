@@ -4,18 +4,15 @@ import { Grid } from "@mui/material";
 import io from "socket.io-client";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import useChatRoom from "@/hooks/useChatRoom";
-import {
-  IsOnlineTypes,
-  IsTypingTypes,
-  MessageTypes,
-  RoomsTypes,
-} from "@/globle";
+import { OnlineTypes, TypingTypes, MessageTypes, RoomsTypes } from "@/globle";
 import { useAllMessages } from "@/hooks/useAllMessages";
 import ChatBody from "./ChatBody";
 import ChatFooter from "./ChatFooter";
 import ChatHeader from "./ChatHeader";
+import NotFound from "@/Layout/NotFound";
+import Loading from "@/Layout/Loading";
 
-const API = process.env.BACKEND_API_KEY;
+const API = process.env.BACKEND_API;
 let typingTimeout: any;
 export const socket = io(API || "http://localhost:8080");
 
@@ -24,24 +21,53 @@ const Chatting = ({ roomId }: { roomId: string }) => {
   const { allRooms } = useChatRoom();
   const { allMessages, setAllMessages } = useAllMessages();
   const [message, setMessage] = useState<string>("");
-  const [isTypingInfo, setIsTypingInfo] = useState<IsTypingTypes>();
+  const [TypingInfo, setTypingInfo] = useState<TypingTypes>({
+    roomId,
+    isTyping: false,
+    currentUserId: currentUser.userName,
+  });
   const [room, setRoom] = useState<RoomsTypes>();
-  const [Online, setOnline] = useState<IsOnlineTypes>();
+  const [Online, setOnline] = useState<OnlineTypes>({
+    roomId,
+    isOnline: false,
+    currentUserId: currentUser.userName,
+  });
   const listRef = useRef<HTMLDivElement | null>(null);
+  const [loading, setLoading] = useState(true);
+  const isOnline =
+    Online.currentUserId !== currentUser.userName && Online.isOnline;
+  const isTyping =
+    TypingInfo.currentUserId !== currentUser.userName && TypingInfo?.isTyping;
+
+  // useEffect(() => {
+  //   // Check and update isSeen
+  //   if (isOnline) {
+  //     const updatedMessages = allMessages.map((msg: MessageTypes) => {
+  //       if (msg.currentUserId !== currentUser.userName && !msg.isSeen) {
+  //         return { ...msg, isSeen: true };
+  //       } else {
+  //         return msg;
+  //       }
+  //     });
+
+  //     setAllMessages(updatedMessages);
+  //     console.log("updatedMessages: ", updatedMessages);
+  //     localStorage.setItem("messages", JSON.stringify(updatedMessages));
+  //   }
+  // }, [isOnline]);
 
   useEffect(() => {
     const myRoom = allRooms.filter(
       (room: RoomsTypes) => room.roomId === roomId
     );
     setRoom({ ...myRoom[0] });
+
     socket.emit("join-room", { roomId, currentUser });
     socket.emit("set-is-online", {
       roomId,
       isOnline: true,
       currentUserId: currentUser.userName,
     });
-
-    const listElement = listRef.current;
 
     socket.on("get-is-online", (online) => {
       setOnline(online);
@@ -51,27 +77,45 @@ const Chatting = ({ roomId }: { roomId: string }) => {
       setAllMessages([...allMessages, msg]);
     });
     socket.on("get-typing", (typingInfo) => {
-      setIsTypingInfo(typingInfo);
+      setTypingInfo(typingInfo);
     });
+
+    // --- Auto-Scrolling ----
+    const listElement = listRef.current;
     if (listElement) {
       const isScrolledToBottom =
         listElement.scrollHeight - listElement.clientHeight <=
         listElement.scrollTop + 1;
-
-      // Scroll to the bottom when a new message is received and not already scrolled to the bottom
       if (!isScrolledToBottom) {
         listElement.scrollTop = listElement.scrollHeight;
       }
     }
-
+    setLoading(false);
     return () => {
-      socket.emit("set-is-online", {
-        roomId,
-        isOnline: false,
-        currentUserId: currentUser.userName,
-      });
+      // {
+      //   isOnline &&
+      //     socket.emit("set-is-online", {
+      //       roomId,
+      //       isOnline: false,
+      //       currentUserId: currentUser.userName,
+      //     });
+      // }
+      setLoading(false);
     };
-  }, [message, allMessages, allRooms, roomId, isTypingInfo]);
+  }, [message, allMessages, allRooms, roomId, isTyping, isOnline]);
+
+  const otherUser =
+    room && room.user1?.userName === currentUser.userName
+      ? { ...room.user2, bgcolor1: "#8f61e6", bgcolor2: "#f47fa1" }
+      : room && { ...room.user1, bgcolor1: "#f47fa1", bgcolor2: "#c0a6f1" };
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (!otherUser?.userName) {
+    return <NotFound />;
+  }
 
   const handleChange = (e: any) => {
     setMessage(e.target.value);
@@ -111,8 +155,9 @@ const Chatting = ({ roomId }: { roomId: string }) => {
       users: room?.roomUsers,
       chat: message,
       time,
-      isSeen: false,
+      isSeen: isOnline,
     };
+
     socket.emit("set-typing", {
       isTyping: false,
       roomId,
@@ -143,10 +188,9 @@ const Chatting = ({ roomId }: { roomId: string }) => {
       <Grid borderRadius={"10px"} width="100%">
         {/* header --- */}
         <ChatHeader
-          currentUser={currentUser}
-          room={room}
-          isTypingInfo={isTypingInfo}
-          Online={Online}
+          isTyping={isTyping}
+          Online={isOnline}
+          otherUser={otherUser}
         />
 
         {/* body -- */}
