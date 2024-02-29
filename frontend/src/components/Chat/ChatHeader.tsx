@@ -1,18 +1,44 @@
-import { OtherUsersTypes, UsersTypes } from "@/globle";
-import { Avatar, Grid, Stack, Typography } from "@mui/material";
+import { OtherUsersTypes, RoomsTypes } from "@/globle";
+import BlockIcon from "@mui/icons-material/Block";
+import { Avatar, Grid, Stack, Tooltip, Typography } from "@mui/material";
 import React from "react";
+import { socket } from "./Chatting";
 
 const ChatHeader = ({
   isTyping,
-  Online,
+  online,
   otherUser,
+  room,
 }: {
-  Online?: boolean;
+  online?: boolean;
   isTyping?: boolean;
   otherUser: OtherUsersTypes;
+  room?: RoomsTypes;
 }) => {
+  const handleBlock = () => {
+    const userId = otherUser?._id;
+    if (room && room.blocked && userId) {
+      let updatedBlockedArray;
+      if (room?.blocked.includes(userId)) {
+        updatedBlockedArray = room?.blocked.filter((id) => id !== userId);
+      } else {
+        updatedBlockedArray = [...room?.blocked, userId];
+      }
+
+      const updatedObj = {
+        ...room,
+        blocked: updatedBlockedArray,
+      };
+      socket.emit("block-user", updatedObj);
+    }
+  };
+
   return (
     <Grid
+      display={"flex"}
+      flexDirection={"row"}
+      justifyContent={"space-between"}
+      alignItems={"center"}
       sx={{
         width: "100%",
         pl: 2,
@@ -36,13 +62,16 @@ const ChatHeader = ({
             <Typography fontWeight="bold" variant="caption">
               {isTyping
                 ? "Typing..."
-                : Online
+                : online
                 ? "In the chat"
                 : "@" + otherUser.userName}
             </Typography>
           </Grid>
         </Stack>
       )}
+      <Tooltip onClick={handleBlock} title={`Block ${otherUser.name}?`}>
+        <BlockIcon sx={{ pr: 2, cursor: "pointer" }} />
+      </Tooltip>
     </Grid>
   );
 };

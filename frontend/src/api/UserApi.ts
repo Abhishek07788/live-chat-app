@@ -1,8 +1,8 @@
 import { UsersTypes } from "@/globle";
 import axios from "axios";
+import { config } from "./config";
 
-const API = process.env.BACKEND_API || "http://localhost:8080";
-
+const API = config.Backend_Api;
 export const handleSignUp = async (data: UsersTypes) => {
   try {
     const response = await axios.post(`${API}/users/signup`, data);

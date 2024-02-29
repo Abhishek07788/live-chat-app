@@ -1,16 +1,15 @@
-export function convertTo12HourFormat(time24: string) {
-  // Splitting the time string into hours and minutes
-  const [hours, minutes] = time24.split(":").map(Number);
-
-  // Determining if it's AM or PM
-  const period = hours >= 12 ? "pm" : "am";
-
-  // Converting hours to 12-hour format
-  const hours12 = hours % 12 || 12;
-
-  // Formatting minutes to always have 2 digits
-  const formattedMinutes = (minutes < 10 ? "0" : "") + minutes;
-
-  // Constructing the string in 12-hour format
-  return `${hours12}:${formattedMinutes} ${period}`;
+export function convertTo12HourFormat(timestamp: string): string {
+  const date = new Date(timestamp);
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+  const AM_PM = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12;
+  hours = hours ? hours : 12; // Handle midnight (0 hours)
+  const formattedTime =
+    hours.toString().padStart(2, "0") +
+    ":" +
+    minutes.toString().padStart(2, "0") +
+    " " +
+    AM_PM;
+  return formattedTime;
 }

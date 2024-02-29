@@ -14,10 +14,10 @@ export interface AllUsersTypes {
 
 export interface RoomsTypes {
   _id?: string;
-  roomUsers: string[];
   roomId: string;
-  user1: UsersTypes;
+  user1: UsersTypes | any;
   user2: UsersTypes;
+  blocked?: string[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -25,10 +25,8 @@ export interface RoomsTypes {
 export interface MessageTypes {
   _id?: string;
   roomId: string;
-  currentUserId: string;
-  users: string[];
+  currentUser: UsersTypes | any;
   chat: string;
-  time: string;
   isSeen: boolean;
   createdAt?: string;
   updatedAt?: string;

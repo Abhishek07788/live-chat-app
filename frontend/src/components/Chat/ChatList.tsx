@@ -1,6 +1,7 @@
 "use client";
 import NotFound from "@/Layout/NotFound";
-import { getAllUsers } from "@/api/Api";
+import { handleJoinRoom } from "@/api/RoomsApi";
+import { getAllUsers } from "@/api/UserApi";
 import { PATHS } from "@/constants/routes";
 import { AllUsersTypes, RoomsTypes, UsersTypes } from "@/globle";
 import useChatRoom from "@/hooks/useChatRoom";
@@ -28,27 +29,15 @@ const ChatList = () => {
     const roomUsers = [user._id, currentUser._id].sort();
     const chatRoom: RoomsTypes = {
       roomId: roomUsers.join(""),
-      roomUsers,
-      user1: user,
-      user2: currentUser,
+      user1: user._id,
+      user2: currentUser._id,
     };
-
-    const existingRoom = allRooms.filter(
-      (existing: RoomsTypes) => existing.roomId === chatRoom.roomId
-    );
-
-    if (existingRoom.length >= 1) {
-      const param = existingRoom[0].roomId;
-      router.push(`${PATHS.chat}/${param}`);
-    } else {
-      localStorage.setItem(
-        "chat-room",
-        JSON.stringify([...allRooms, chatRoom])
-      );
-      setAllRooms((prev: RoomsTypes[]) => [...prev, chatRoom]);
-      const param = chatRoom.roomId;
-      router.push(`${PATHS.chat}/${param}`);
-    }
+    handleJoinRoom(chatRoom).then((data) => {
+      const param = data?.room.roomId;
+      param
+        ? router.push(`${PATHS.chat}/${param}`)
+        : alert("Something went wrong!");
+    });
   };
 
   return (

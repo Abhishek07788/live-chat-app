@@ -1,5 +1,5 @@
 "use client";
-import { handleSignUp } from "@/api/Api";
+import { handleSignUp } from "@/api/UserApi";
 import { UsersTypes } from "@/globle";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { Button, Grid, TextField } from "@mui/material";
@@ -26,10 +26,9 @@ const Signup = () => {
     }
     const user: UsersTypes = { name, userName, password };
     handleSignUp(user).then((singleUser) => {
-      console.log("singleUser: ", singleUser);
       if (singleUser.status) {
-        localStorage.setItem("currentUser", JSON.stringify(singleUser));
-        setCurrentUser(singleUser);
+        localStorage.setItem("currentUser", JSON.stringify(singleUser.user));
+        setCurrentUser(singleUser.user);
         router.push("/chat", { scroll: false });
         setName("");
         setPassword("");
