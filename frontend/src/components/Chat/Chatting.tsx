@@ -1,7 +1,6 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
-import { Alert, Grid, Typography } from "@mui/material";
-import io from "socket.io-client";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { Alert, Grid } from "@mui/material";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { OnlineTypes, TypingTypes, MessageTypes, RoomsTypes } from "@/globle";
 import ChatBody from "./ChatBody";
@@ -11,10 +10,10 @@ import NotFound from "@/Layout/NotFound";
 import Loading from "@/Layout/Loading";
 import { getSingleRoom } from "@/api/RoomsApi";
 import { getRoomMessages, sendMessage } from "@/api/MessagesApi";
+import { socket } from "@/api/config";
 
 const API = process.env.BACKEND_API;
 let typingTimeout: any;
-export const socket = io(API || "http://localhost:8080");
 
 const Chatting = ({ roomId }: { roomId: string }) => {
   const { currentUser } = useCurrentUser();
@@ -69,6 +68,9 @@ const Chatting = ({ roomId }: { roomId: string }) => {
     socket.on("get-typing", (typingInfo) => {
       setTypingInfo(typingInfo);
     });
+    socket.on("get-block-user", (blocked_user) => {
+      setRoom(blocked_user);
+    });
     return () => {
       socket.emit("set-is-online", {
         roomId,
@@ -98,16 +100,17 @@ const Chatting = ({ roomId }: { roomId: string }) => {
     };
   }, [roomId, currentUser]);
 
-  const otherUser =
-    room && room.user1?.userName === currentUser.userName
+  const otherUser = useMemo(() => {
+    return room && room.user1?.userName === currentUser.userName
       ? { ...room.user2, bgcolor1: "#8f61e6", bgcolor2: "#f47fa1" }
       : room && { ...room.user1, bgcolor1: "#f47fa1", bgcolor2: "#c0a6f1" };
+  }, [room]);
 
   if (loading) {
     return <Loading />;
   }
 
-  if (error || !roomId) {
+  if (error || !roomId || !room) {
     return <NotFound />;
   }
 
@@ -180,6 +183,7 @@ const Chatting = ({ roomId }: { roomId: string }) => {
           online={isOnline}
           otherUser={otherUser}
           room={room}
+          setRoom={setRoom}
         />
 
         {/* body -- */}

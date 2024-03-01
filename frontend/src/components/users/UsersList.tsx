@@ -1,18 +1,19 @@
 "use client";
+import Loading from "@/Layout/Loading";
 import NotFound from "@/Layout/NotFound";
 import { handleJoinRoom } from "@/api/RoomsApi";
 import { getAllUsers } from "@/api/UserApi";
 import { PATHS } from "@/constants/routes";
 import { AllUsersTypes, RoomsTypes, UsersTypes } from "@/globle";
-import useChatRoom from "@/hooks/useChatRoom";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { Avatar, Grid, Stack, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-const ChatList = () => {
+const UsersList = () => {
   const { currentUser } = useCurrentUser();
-  const { allRooms, setAllRooms } = useChatRoom();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [allUsers, setAllUsers] = useState<AllUsersTypes>({
     users: [],
     count: 0,
@@ -20,9 +21,15 @@ const ChatList = () => {
   const router = useRouter();
 
   useEffect(() => {
-    getAllUsers().then((users) => {
-      setAllUsers(users);
-    });
+    getAllUsers()
+      .then((users) => {
+        setAllUsers(users);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("error: ", error);
+        setError(true);
+      });
   }, []);
 
   const handleUserClick = (user: UsersTypes) => {
@@ -32,13 +39,26 @@ const ChatList = () => {
       user1: user._id,
       user2: currentUser._id,
     };
-    handleJoinRoom(chatRoom).then((data) => {
-      const param = data?.room.roomId;
-      param
-        ? router.push(`${PATHS.chat}/${param}`)
-        : alert("Something went wrong!");
-    });
+    handleJoinRoom(chatRoom)
+      .then((data) => {
+        const param = data?.room.roomId;
+        param
+          ? router.push(`${PATHS.chat}/${param}`)
+          : alert("Something went wrong!");
+      })
+      .catch((error) => {
+        console.error("error: ", error);
+        setError(true);
+      });
   };
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <NotFound title="Something went wrong!" />;
+  }
 
   return (
     <>
@@ -101,4 +121,4 @@ const ChatList = () => {
   );
 };
 
-export default ChatList;
+export default UsersList;

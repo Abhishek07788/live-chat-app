@@ -1,23 +1,26 @@
+import { handleBlockRoomUser } from "@/api/RoomsApi";
+import { socket } from "@/api/config";
 import { OtherUsersTypes, RoomsTypes } from "@/globle";
-import BlockIcon from "@mui/icons-material/Block";
-import { Avatar, Grid, Stack, Tooltip, Typography } from "@mui/material";
-import React from "react";
-import { socket } from "./Chatting";
+import { Avatar, Grid, Stack, Typography } from "@mui/material";
+import React, { memo } from "react";
+import MoreOptions from "../common/MoreOptions";
 
 const ChatHeader = ({
   isTyping,
   online,
   otherUser,
   room,
+  setRoom,
 }: {
   online?: boolean;
   isTyping?: boolean;
   otherUser: OtherUsersTypes;
-  room?: RoomsTypes;
+  room: RoomsTypes;
+  setRoom: (room: RoomsTypes) => void;
 }) => {
+  const userId = otherUser?._id;
   const handleBlock = () => {
-    const userId = otherUser?._id;
-    if (room && room.blocked && userId) {
+    if (room.blocked && userId) {
       let updatedBlockedArray;
       if (room?.blocked.includes(userId)) {
         updatedBlockedArray = room?.blocked.filter((id) => id !== userId);
@@ -29,9 +32,19 @@ const ChatHeader = ({
         ...room,
         blocked: updatedBlockedArray,
       };
-      socket.emit("block-user", updatedObj);
+      socket.emit("set-block-user", updatedObj);
+      handleBlockRoomUser(updatedObj).then((updatedRoom) => {
+        setRoom(updatedRoom.room);
+      });
     }
   };
+
+  const MenuList = [
+    {
+      title: room?.blocked?.includes(userId || "") ? "Unblock" : "Block",
+      onClick: handleBlock,
+    },
+  ];
 
   return (
     <Grid
@@ -69,11 +82,18 @@ const ChatHeader = ({
           </Grid>
         </Stack>
       )}
-      <Tooltip onClick={handleBlock} title={`Block ${otherUser.name}?`}>
-        <BlockIcon sx={{ pr: 2, cursor: "pointer" }} />
-      </Tooltip>
+
+      <MoreOptions MenuList={MenuList} />
+      {/* <Tooltip
+        onClick={handleBlock}
+        title={`${
+          room?.blocked?.includes(userId || "") ? "Unblock" : "Block"
+        } ${otherUser.name}?`}
+      >
+        <BlockIcon sx={{ pr: 2, cursor: "pointer", fontSize: 20 }} />
+      </Tooltip> */}
     </Grid>
   );
 };
 
-export default ChatHeader;
+export default memo(ChatHeader);

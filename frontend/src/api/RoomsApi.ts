@@ -23,3 +23,14 @@ export const getSingleRoom = async (roomId: string) => {
     console.log("error: ", error);
   }
 };
+
+// -- update/block room user ---
+export const handleBlockRoomUser = async (data: RoomsTypes) => {
+  console.log("data: ", data);
+  try {
+    const response = await axios.put(`${API}/room/block/${data._id}`, data);
+    return response.data;
+  } catch (error) {
+    console.log("error: ", error);
+  }
+};
