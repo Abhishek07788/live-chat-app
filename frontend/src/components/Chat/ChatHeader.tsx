@@ -1,9 +1,8 @@
-import { handleBlockRoomUser } from "@/api/RoomsApi";
-import { socket } from "@/api/config";
 import { OtherUsersTypes, RoomsTypes } from "@/globle";
 import { Avatar, Grid, Stack, Typography } from "@mui/material";
 import React, { memo } from "react";
 import MoreOptions from "../common/MoreOptions";
+import { UserApiFunctions } from "@/common/UserApiFunction";
 
 const ChatHeader = ({
   isTyping,
@@ -19,30 +18,12 @@ const ChatHeader = ({
   setRoom: (room: RoomsTypes) => void;
 }) => {
   const userId = otherUser?._id;
-  const handleBlock = () => {
-    if (room.blocked && userId) {
-      let updatedBlockedArray;
-      if (room?.blocked.includes(userId)) {
-        updatedBlockedArray = room?.blocked.filter((id) => id !== userId);
-      } else {
-        updatedBlockedArray = [...room?.blocked, userId];
-      }
-
-      const updatedObj = {
-        ...room,
-        blocked: updatedBlockedArray,
-      };
-      socket.emit("set-block-user", updatedObj);
-      handleBlockRoomUser(updatedObj).then((updatedRoom) => {
-        setRoom(updatedRoom.room);
-      });
-    }
-  };
+  const { blockRoomUser } = UserApiFunctions();
 
   const MenuList = [
     {
       title: room?.blocked?.includes(userId || "") ? "Unblock" : "Block",
-      onClick: handleBlock,
+      onClick: () => blockRoomUser(room, setRoom, userId || ""),
     },
   ];
 
@@ -82,16 +63,7 @@ const ChatHeader = ({
           </Grid>
         </Stack>
       )}
-
       <MoreOptions MenuList={MenuList} />
-      {/* <Tooltip
-        onClick={handleBlock}
-        title={`${
-          room?.blocked?.includes(userId || "") ? "Unblock" : "Block"
-        } ${otherUser.name}?`}
-      >
-        <BlockIcon sx={{ pr: 2, cursor: "pointer", fontSize: 20 }} />
-      </Tooltip> */}
     </Grid>
   );
 };

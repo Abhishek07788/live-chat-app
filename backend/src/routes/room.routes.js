@@ -17,7 +17,8 @@ app.post("/join", async (req, res) => {
     } else {
       await Room.create(req.body);
       const room = await Room.findOne({ roomId }).populate(
-        "user1 user2 -password"
+        "user1 user2",
+        "-password"
       );
       return res.status(201).send({ room, message: "Room created" });
     }

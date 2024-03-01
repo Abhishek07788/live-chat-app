@@ -1,62 +1,40 @@
 "use client";
 import Loading from "@/Layout/Loading";
 import NotFound from "@/Layout/NotFound";
-import { handleJoinRoom } from "@/api/RoomsApi";
-import { getAllUsers } from "@/api/UserApi";
-import { PATHS } from "@/constants/routes";
-import { AllUsersTypes, RoomsTypes, UsersTypes } from "@/globle";
+import { RoomApiFunctions } from "@/common/RoomApiFunctions";
+import { UserApiFunctions } from "@/common/UserApiFunction";
+import { RoomsTypes, UsersTypes } from "@/globle";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { Avatar, Grid, Stack, Typography } from "@mui/material";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 const UsersList = () => {
   const { currentUser } = useCurrentUser();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [allUsers, setAllUsers] = useState<AllUsersTypes>({
-    users: [],
-    count: 0,
-  });
-  const router = useRouter();
+  const { loading, error, allUsers, handleAllUsers } = UserApiFunctions();
+  const {
+    loading: roomLoading,
+    error: roomError,
+    JOIN_ROOM,
+  } = RoomApiFunctions();
 
   useEffect(() => {
-    getAllUsers()
-      .then((users) => {
-        setAllUsers(users);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("error: ", error);
-        setError(true);
-      });
+    handleAllUsers();
   }, []);
 
   const handleUserClick = (user: UsersTypes) => {
-    const roomUsers = [user._id, currentUser._id].sort();
     const chatRoom: RoomsTypes = {
-      roomId: roomUsers.join(""),
+      roomId: [user._id, currentUser._id].sort().join(""),
       user1: user._id,
       user2: currentUser._id,
     };
-    handleJoinRoom(chatRoom)
-      .then((data) => {
-        const param = data?.room.roomId;
-        param
-          ? router.push(`${PATHS.chat}/${param}`)
-          : alert("Something went wrong!");
-      })
-      .catch((error) => {
-        console.error("error: ", error);
-        setError(true);
-      });
+    JOIN_ROOM(chatRoom);
   };
 
-  if (loading) {
+  if (loading || roomLoading) {
     return <Loading />;
   }
 
-  if (error) {
+  if ((!loading && error) || (!loading && roomError)) {
     return <NotFound title="Something went wrong!" />;
   }
 

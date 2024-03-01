@@ -26,7 +26,6 @@ export const getSingleRoom = async (roomId: string) => {
 
 // -- update/block room user ---
 export const handleBlockRoomUser = async (data: RoomsTypes) => {
-  console.log("data: ", data);
   try {
     const response = await axios.put(`${API}/room/block/${data._id}`, data);
     return response.data;
