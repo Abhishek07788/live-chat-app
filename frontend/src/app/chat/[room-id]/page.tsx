@@ -1,5 +1,5 @@
 import Layout from "@/Layout";
-import Chatting from "@/components/Chat/Chatting";
+import Chatting from "@/components/Chat";
 import { QP } from "@/constants/routes";
 import React from "react";
 

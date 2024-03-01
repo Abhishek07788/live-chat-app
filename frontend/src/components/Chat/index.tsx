@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Alert, Grid } from "@mui/material";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { MessageTypes } from "@/globle";
@@ -12,25 +12,25 @@ import { ChatApiFunctions } from "@/common/ChatApiFunctions";
 import { RoomApiFunctions } from "@/common/RoomApiFunctions";
 import { TypingAndOnline } from "@/common/TypingAndOnline";
 import { AllSockets } from "@/socket.io/AllSockets";
-import { autoScrollFunction } from "@/types/autoScrollFunction";
 import { socket } from "@/api/config";
 
 const Chatting = ({ roomId }: { roomId: string }) => {
   const { currentUser } = useCurrentUser();
   const listRef = useRef<HTMLDivElement | null>(null);
+  const [message, setMessage] = useState<string>("");
   const {
     loading: ChatLoading,
     allMessages,
     handleGetAllChats,
     handleSendMessage,
     setAllMessages,
+    SeenAllMessages,
   } = ChatApiFunctions(roomId);
   const { handleGetSingleRoom, error, loading, setRoom, room, otherUser } =
     RoomApiFunctions();
   const { SET_ONLINE, SET_TYPING } = AllSockets(roomId);
   const { handleSetTyping, isTyping, isOnline, setOnlineInfo, setTypingInfo } =
     TypingAndOnline(roomId);
-  const [message, setMessage] = useState<string>("");
 
   useEffect(() => {
     socket.emit("join-room", { roomId, currentUser });
@@ -39,7 +39,6 @@ const Chatting = ({ roomId }: { roomId: string }) => {
     socket.on("get-message", (msg) => {
       setAllMessages((prevMessages) => [...prevMessages, msg]);
     });
-    autoScrollFunction(listRef.current);
     return () => {
       // ----- Off Socket -------
       socket.off("get-message");
@@ -61,6 +60,27 @@ const Chatting = ({ roomId }: { roomId: string }) => {
       SET_ONLINE(false);
     };
   }, [roomId, currentUser, isTyping]);
+
+  useEffect(() => {
+    if (isOnline && otherUser) {
+      SeenAllMessages(otherUser?._id);
+      setTimeout(() => {
+        handleGetAllChats();
+      }, 1000);
+    }
+  }, [isOnline, otherUser]);
+
+  useEffect(() => {
+    const listElement = listRef.current;
+    if (listElement) {
+      const isScrolledToBottom =
+        listElement.scrollHeight - listElement.clientHeight <=
+        listElement.scrollTop + 1;
+      if (!isScrolledToBottom) {
+        listElement.scrollTop = listElement.scrollHeight;
+      }
+    }
+  }, [allMessages]);
 
   if (loading && ChatLoading && !roomId && !room) {
     return <Loading />;
