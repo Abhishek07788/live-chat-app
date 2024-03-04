@@ -6,25 +6,24 @@ import { useState } from "react";
 
 export const UserApiFunctions = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
   const [allUsers, setAllUsers] = useState<AllUsersTypes>({
     users: [],
     count: 0,
   });
 
   const handleAllUsers = () => {
-    setError(false);
     setLoading(true);
     getAllUsers()
       .then((users) => {
         setAllUsers(users);
-        setError(false);
+        setError(users.message);
         setLoading(false);
       })
       .catch((error) => {
-        console.error("error: ", error);
+        console.error("error: ", error.message);
         setLoading(false);
-        setError(true);
+        setError(error.message);
       });
   };
 
@@ -33,7 +32,6 @@ export const UserApiFunctions = () => {
     setRoom: (room: RoomsTypes) => void,
     userId: string
   ) => {
-    setError(false);
     setLoading(true);
     if (room.blocked && userId) {
       let updatedBlockedArray;
@@ -53,9 +51,8 @@ export const UserApiFunctions = () => {
           setRoom(updatedRoom.room);
         })
         .catch((error) => {
-          console.error("error: ", error);
+          console.error("error: ", error.message);
           setLoading(false);
-          setError(true);
         });
     }
   };

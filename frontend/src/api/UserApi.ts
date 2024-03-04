@@ -2,10 +2,10 @@ import { UsersTypes } from "@/globle";
 import axios from "axios";
 import { config } from "./config";
 
-const API = config.Backend_Api;
+const { Backend_Api, Authentication_Token } = config;
 export const handleSignUp = async (data: UsersTypes) => {
   try {
-    const response = await axios.post(`${API}/users/signup`, data);
+    const response = await axios.post(`${Backend_Api}/users/signup`, data);
     return response.data;
   } catch (error) {
     console.error("Error during sign-up:", error);
@@ -15,7 +15,7 @@ export const handleSignUp = async (data: UsersTypes) => {
 
 export const handleLogin = async (data: UsersTypes) => {
   try {
-    const response = await axios.post(`${API}/users/login`, data);
+    const response = await axios.post(`${Backend_Api}/users/login`, data);
     return response.data;
   } catch (error) {
     console.error("Error during sign-up:", error);
@@ -25,7 +25,9 @@ export const handleLogin = async (data: UsersTypes) => {
 
 export const getAllUsers = async () => {
   try {
-    const users = await axios.get(`${API}/users`);
+    const users = await axios.get(`${Backend_Api}/users`, {
+      headers: { Authorization: Authentication_Token },
+    });
     return users.data;
   } catch (error) {
     console.log(error);

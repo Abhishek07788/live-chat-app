@@ -1,10 +1,11 @@
 const express = require("express");
 const User = require("../schemas/user.schema");
+const middleware = require("../middleware/middleware");
 const app = express.Router();
 
 // --- SignUp --
 app.post("/signup", async (req, res) => {
-  const { name, userName } = req.body;
+  const { userName } = req.body;
   try {
     const user = await User.findOne({ userName });
     if (user) {
@@ -36,7 +37,7 @@ app.post("/login", async (req, res) => {
 });
 
 // --- get all users --
-app.get("/", async (req, res) => {
+app.get("/", middleware, async (req, res) => {
   try {
     const users = await User.find({})
       .sort({ createdAt: -1 })

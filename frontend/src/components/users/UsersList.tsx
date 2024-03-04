@@ -8,7 +8,6 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import { Grid, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import UserListCard from "./UserListCard";
-import { socket } from "@/api/config";
 
 const UsersList = () => {
   const { currentUser } = useCurrentUser();
@@ -36,8 +35,8 @@ const UsersList = () => {
     return <Loading />;
   }
 
-  if ((!loading && error) || (!loading && roomError)) {
-    return <NotFound title="Something went wrong!" />;
+  if (!loading && error) {
+    return <NotFound title={error || "Server Error!"} />;
   }
 
   return (
