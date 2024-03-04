@@ -46,18 +46,29 @@ app.get("/", async (req, res) => {
   }
 });
 
-app.patch("/seen/:userId", async (req, res) => {
+// --- seen the messages --
+app.patch("/seen", async (req, res) => {
+  const { userId, roomId } = req.body;
   try {
     await Message.updateMany(
       {
-        currentUser: req.params.userId,
+        currentUser: userId,
+        roomId: roomId,
         isSeen: false,
       },
       {
         $set: { isSeen: true },
       }
     );
-    res.status(200).send({ status: true, message: "Message Seen!" });
+    const msg = await Message.find({ roomId }).populate(
+      "currentUser",
+      "-password"
+    );
+    if (msg) {
+      return res
+        .status(200)
+        .send({ msg, status: true, message: "Message Seen!" });
+    }
   } catch (error) {
     console.log("error: ", error.message);
     res.status(400).send(error);

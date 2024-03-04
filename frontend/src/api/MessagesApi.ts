@@ -25,9 +25,12 @@ export const getRoomMessages = async (roomId: string) => {
 };
 
 // -- set messages seen  ---
-export const handleMessagesSeen = async (otherUser_Id: string) => {
+export const handleMessagesSeen = async (userId: string, roomId: string) => {
   try {
-    const response = await axios.patch(`${API}/msg/seen/${otherUser_Id}`);
+    const response = await axios.patch(`${API}/msg/seen`, {
+      userId,
+      roomId,
+    });
     return response.data;
   } catch (error) {
     console.log("error: ", error);

@@ -4,12 +4,14 @@ import { RoomsTypes } from "@/globle";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { ChatApiFunctions } from "./ChatApiFunctions";
 
 export const RoomApiFunctions = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [room, setRoom] = useState<RoomsTypes>();
   const router = useRouter();
+  const { SeenAllMessages } = ChatApiFunctions();
   const { currentUser } = useCurrentUser();
 
   const JOIN_ROOM = (chatRoom: RoomsTypes) => {
@@ -17,9 +19,13 @@ export const RoomApiFunctions = () => {
     setLoading(true);
     handleJoinRoom(chatRoom)
       .then((data) => {
-        const param = data?.room.roomId;
-        param
-          ? router.push(`${PATHS.chat}/${param}`)
+        const roomID = data?.room?.roomId;
+        const isExist = data?.isExist;
+        if (isExist) {
+          SeenAllMessages(chatRoom?.user1, roomID);
+        }
+        roomID
+          ? router.push(`${PATHS.chat}/${roomID}`)
           : alert("Something went wrong. Please try again!");
         setError(false);
         setLoading(false);

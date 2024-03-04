@@ -7,12 +7,12 @@ import { socket } from "@/api/config";
 import { MessageTypes } from "@/globle";
 import { useState } from "react";
 
-export const ChatApiFunctions = (roomId: string) => {
+export const ChatApiFunctions = () => {
   const [allMessages, setAllMessages] = useState<MessageTypes[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  const handleGetAllChats = () => {
+  const handleGetAllChats = (roomId: string) => {
     setError(false);
     setLoading(true);
     getRoomMessages(roomId)
@@ -49,11 +49,12 @@ export const ChatApiFunctions = (roomId: string) => {
       });
   };
 
-  const SeenAllMessages = (otherUserId: string) => {
+  const SeenAllMessages = (otherUserId: string, roomId: string) => {
     setError(false);
     setLoading(true);
-    handleMessagesSeen(otherUserId)
+    handleMessagesSeen(otherUserId, roomId)
       .then((data) => {
+        setAllMessages(data.msg);
         setError(false);
         setLoading(false);
       })

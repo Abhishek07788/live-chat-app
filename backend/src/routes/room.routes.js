@@ -13,14 +13,18 @@ app.post("/join", async (req, res) => {
       "-password"
     );
     if (room) {
-      return res.status(201).send({ room, message: "Room already exists" });
+      return res
+        .status(201)
+        .send({ room, message: "Room already exists", isExist: true });
     } else {
       await Room.create(req.body);
       const room = await Room.findOne({ roomId }).populate(
         "user1 user2",
         "-password"
       );
-      return res.status(201).send({ room, message: "Room created" });
+      return res
+        .status(201)
+        .send({ room, message: "Room created", isExist: false });
     }
   } catch (error) {
     console.log("error: ", error.message);

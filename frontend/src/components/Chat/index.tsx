@@ -25,7 +25,7 @@ const Chatting = ({ roomId }: { roomId: string }) => {
     handleSendMessage,
     setAllMessages,
     SeenAllMessages,
-  } = ChatApiFunctions(roomId);
+  } = ChatApiFunctions();
   const { handleGetSingleRoom, error, loading, setRoom, room, otherUser } =
     RoomApiFunctions();
   const { SET_ONLINE, SET_TYPING } = AllSockets(roomId);
@@ -35,7 +35,7 @@ const Chatting = ({ roomId }: { roomId: string }) => {
   useEffect(() => {
     socket.emit("join-room", { roomId, currentUser });
     handleGetSingleRoom(roomId);
-    handleGetAllChats();
+    handleGetAllChats(roomId);
     socket.on("get-message", (msg) => {
       setAllMessages((prevMessages) => [...prevMessages, msg]);
     });
@@ -63,10 +63,7 @@ const Chatting = ({ roomId }: { roomId: string }) => {
 
   useEffect(() => {
     if (isOnline && otherUser) {
-      SeenAllMessages(otherUser?._id);
-      setTimeout(() => {
-        handleGetAllChats();
-      }, 1000);
+      SeenAllMessages(otherUser?._id, roomId);
     }
   }, [isOnline, otherUser]);
 
