@@ -56,6 +56,11 @@ io.on("connection", (socket) => {
     socket.to(message.roomId).emit("get-message-seen", message);
   });
 
+  //-- unseen messages --
+  socket.on("set-unSeen", (unSeenData) => {
+    io.emit("get-unSeen", unSeenData);
+  });
+
   // block-user ---
   socket.on("set-block-user", (updatedObj) => {
     socket.to(updatedObj.roomId).emit("get-block-user", updatedObj);

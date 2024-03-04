@@ -25,6 +25,10 @@ const Chatting = ({ roomId }: { roomId: string }) => {
     handleSendMessage,
     setAllMessages,
     SeenAllMessages,
+    getUnseenMessages,
+    unseenCount,
+    setLastMsg,
+    setUnseenCount,
   } = ChatApiFunctions();
   const { handleGetSingleRoom, error, loading, setRoom, room, otherUser } =
     RoomApiFunctions();
@@ -36,6 +40,7 @@ const Chatting = ({ roomId }: { roomId: string }) => {
     socket.emit("join-room", { roomId, currentUser });
     handleGetSingleRoom(roomId);
     handleGetAllChats(roomId);
+    getUnseenMessages(currentUser?._id, roomId);
     socket.on("get-message", (msg) => {
       setAllMessages((prevMessages) => [...prevMessages, msg]);
     });
@@ -110,6 +115,7 @@ const Chatting = ({ roomId }: { roomId: string }) => {
     };
     handleSendMessage(newMessage, setMessage);
     SET_TYPING(false);
+    socket.emit("set-unSeen", { newMessage, unseenCount: unseenCount + 1 });
   };
 
   return (

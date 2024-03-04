@@ -13,7 +13,7 @@ app.post("/", async (req, res) => {
     return res.status(201).send(msg);
   } catch (error) {
     console.log("error: ", error.message);
-    res.status(400).send(error);
+    res.status(400).send({ message: error.message });
   }
 });
 
@@ -31,7 +31,7 @@ app.get("/:roomId", async (req, res) => {
     }
   } catch (error) {
     console.log("error: ", error.message);
-    res.status(400).send(error);
+    res.status(400).send({ message: error.message });
   }
 });
 
@@ -42,7 +42,7 @@ app.get("/", async (req, res) => {
     return res.status(200).send(msg);
   } catch (error) {
     console.log("error: ", error.message);
-    res.status(400).send(error);
+    res.status(400).send({ message: error.message });
   }
 });
 
@@ -71,21 +71,39 @@ app.patch("/seen", async (req, res) => {
     }
   } catch (error) {
     console.log("error: ", error.message);
-    res.status(400).send(error);
+    res.status(400).send({ message: error.message });
   }
 });
 
 // -- getAll unSeen Messages ----
-app.get("/unseen/:roomId", async (req, res) => {
+app.post("/unseen/count", async (req, res) => {
+  const { userId, roomId } = req.body;
   try {
     const count = await Message.countDocuments({
-      roomId: req.params.roomId,
+      roomId: roomId,
+      currentUser: userId,
       isSeen: false,
     });
-    res.status(200).send({ count });
+    const lastMsg = await Message.findOne({
+      roomId: roomId,
+    })
+      .sort({ createdAt: -1 })
+      .populate("currentUser", "-password");
+    if (lastMsg) {
+      return res.status(200).send({
+        count,
+        lastMsg,
+        status: true,
+        message: `${count} Messages Found!`,
+      });
+    } else {
+      return res
+        .status(200)
+        .send({ count, lastMsg: {}, status: false, message: "No message" });
+    }
   } catch (error) {
     console.log("error: ", error.message);
-    res.status(400).send(error);
+    res.status(400).send({ message: error.message });
   }
 });
 
@@ -102,7 +120,7 @@ app.delete("/:id", async (req, res) => {
     }
   } catch (error) {
     console.log("error: ", error.message);
-    res.status(400).send(error);
+    res.status(400).send({ message: error.message });
   }
 });
 
@@ -123,7 +141,7 @@ app.put("/seen/:id", async (req, res) => {
     }
   } catch (error) {
     console.error("Error:", error.message);
-    res.status(400).send(error);
+    res.status(400).send({ message: error.message });
   }
 });
 

@@ -28,7 +28,7 @@ app.post("/join", async (req, res) => {
     }
   } catch (error) {
     console.log("error: ", error.message);
-    res.status(400).send(error);
+    res.status(400).send({ message: error.message });
   }
 });
 
@@ -46,7 +46,7 @@ app.get("/:roomId", async (req, res) => {
     }
   } catch (error) {
     console.log("error: ", error.message);
-    res.status(400).send(error);
+    res.status(400).send({ message: error.message });
   }
 });
 
@@ -57,7 +57,7 @@ app.get("/", async (req, res) => {
     return res.status(200).send(room);
   } catch (error) {
     console.log("error: ", error.message);
-    res.status(400).send(error);
+    res.status(400).send({ message: error.message });
   }
 });
 
@@ -72,7 +72,7 @@ app.delete("/:id", async (req, res) => {
     }
   } catch (error) {
     console.log("error: ", error.message);
-    res.status(400).send(error);
+    res.status(400).send({ message: error.message });
   }
 });
 
@@ -91,7 +91,7 @@ app.put("/block/:id", async (req, res) => {
     }
   } catch (error) {
     console.error("Error:", error.message);
-    res.status(400).send(error);
+    res.status(400).send({ message: error.message });
   }
 });
 

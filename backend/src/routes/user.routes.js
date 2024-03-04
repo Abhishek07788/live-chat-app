@@ -18,7 +18,7 @@ app.post("/signup", async (req, res) => {
         .send({ user, status: true, message: "Signup successfully" });
     }
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send({ message: error.message });
   }
 });
 
@@ -31,7 +31,7 @@ app.post("/login", async (req, res) => {
     }
     res.status(200).send({ user, message: "Login successfully", status: true });
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send({ message: error.message });
   }
 });
 

@@ -36,3 +36,19 @@ export const handleMessagesSeen = async (userId: string, roomId: string) => {
     console.log("error: ", error);
   }
 };
+
+// -- get unseen count messages ---
+export const getUnseenMessagesAndCount = async (
+  userId: string,
+  roomId: string
+) => {
+  try {
+    const response = await axios.post(`${API}/msg/unseen/count`, {
+      userId,
+      roomId,
+    });
+    return response.data;
+  } catch (error) {
+    console.log("error: ", error);
+  }
+};

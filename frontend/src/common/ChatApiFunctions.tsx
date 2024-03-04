@@ -1,5 +1,6 @@
 import {
   getRoomMessages,
+  getUnseenMessagesAndCount,
   handleMessagesSeen,
   sendMessage,
 } from "@/api/MessagesApi";
@@ -11,6 +12,8 @@ export const ChatApiFunctions = () => {
   const [allMessages, setAllMessages] = useState<MessageTypes[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [unseenCount, setUnseenCount] = useState(0);
+  const [lastMsg, setLastMsg] = useState<MessageTypes>();
 
   const handleGetAllChats = (roomId: string) => {
     setError(false);
@@ -22,7 +25,7 @@ export const ChatApiFunctions = () => {
         setLoading(false);
       })
       .catch((error) => {
-        console.error("error: ", error);
+        console.error("error: ", error.message);
         setLoading(false);
         setError(true);
       });
@@ -43,7 +46,7 @@ export const ChatApiFunctions = () => {
         setMessage("");
       })
       .catch((error) => {
-        console.error("error: ", error);
+        console.error("error: ", error.message);
         setLoading(false);
         setError(true);
       });
@@ -59,8 +62,20 @@ export const ChatApiFunctions = () => {
         setLoading(false);
       })
       .catch((error) => {
-        console.error("error: ", error);
+        console.error("error: ", error.message);
         setLoading(false);
+        setError(true);
+      });
+  };
+
+  const getUnseenMessages = (otherUserId: string, roomId: string) => {
+    getUnseenMessagesAndCount(otherUserId, roomId)
+      .then((data) => {
+        setUnseenCount(data.count);
+        setLastMsg(data.lastMsg);
+      })
+      .catch((error) => {
+        console.error("error: ", error.message);
         setError(true);
       });
   };
@@ -73,5 +88,10 @@ export const ChatApiFunctions = () => {
     allMessages,
     setAllMessages,
     SeenAllMessages,
+    getUnseenMessages,
+    unseenCount,
+    setUnseenCount,
+    setLastMsg,
+    lastMsg,
   };
 };
