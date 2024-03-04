@@ -27,8 +27,6 @@ const Chatting = ({ roomId }: { roomId: string }) => {
     SeenAllMessages,
     getUnseenMessages,
     unseenCount,
-    setLastMsg,
-    setUnseenCount,
   } = ChatApiFunctions();
   const { handleGetSingleRoom, error, loading, setRoom, room, otherUser } =
     RoomApiFunctions();
@@ -140,6 +138,7 @@ const Chatting = ({ roomId }: { roomId: string }) => {
             otherUser={otherUser}
             room={room}
             setRoom={setRoom}
+            currentUser={currentUser}
           />
         )}
 

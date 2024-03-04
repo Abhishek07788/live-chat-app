@@ -1,4 +1,4 @@
-import { OtherUsersTypes, RoomsTypes } from "@/globle";
+import { OtherUsersTypes, RoomsTypes, UsersTypes } from "@/globle";
 import { Avatar, Grid, Stack, Typography } from "@mui/material";
 import React, { memo } from "react";
 import MoreOptions from "../common/MoreOptions";
@@ -10,12 +10,14 @@ const ChatHeader = ({
   otherUser,
   room,
   setRoom,
+  currentUser,
 }: {
   online?: boolean;
   isTyping?: boolean;
   otherUser: OtherUsersTypes;
   room: RoomsTypes;
   setRoom: (room: RoomsTypes) => void;
+  currentUser: UsersTypes;
 }) => {
   const userId = otherUser?._id;
   const { blockRoomUser } = UserApiFunctions();
@@ -53,13 +55,15 @@ const ChatHeader = ({
           </Avatar>
           <Grid>
             <Typography mb={-1}>{otherUser.name}</Typography>
-            <Typography fontWeight="bold" variant="caption">
-              {isTyping
-                ? "Typing..."
-                : online
-                ? "In the chat"
-                : "@" + otherUser.userName}
-            </Typography>
+            {!room?.blocked?.includes(currentUser._id || "") && (
+              <Typography fontWeight="bold" variant="caption">
+                {isTyping
+                  ? "Typing..."
+                  : online
+                  ? "In the chat"
+                  : "@" + otherUser.userName}
+              </Typography>
+            )}
           </Grid>
         </Stack>
       )}
