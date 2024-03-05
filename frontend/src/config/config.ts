@@ -7,7 +7,9 @@ const getCurrentUser = () => {
 
 export const config = {
   API: process.env.NEXT_PUBLIC_BACKEND_API || "",
-  Authentication_Token: getCurrentUser()?.userName,
+  AxiosAuthConfig: {
+    headers: { Authorization: getCurrentUser()?.userName },
+  },
 };
 
 export const socket = io(config.API);

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { config } from "@/config/config";
 import axios, { AxiosError } from "axios";
 
-const { API, Authentication_Token } = config;
+const { API, AxiosAuthConfig } = config;
 export const UserApiFunctions = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<AxiosError | any>();
@@ -13,21 +13,28 @@ export const UserApiFunctions = () => {
     count: 0,
   });
 
+  const handleApiRequest = async (requestFunction: any, ...args: any[]) => {
+    setError("");
+    setLoading(true);
+    try {
+      const { data } = await requestFunction(...args);
+      setError("");
+      setLoading(false);
+      return data;
+    } catch (error) {
+      setError(error);
+      setLoading(false);
+    }
+  };
+
   // --- getAll users --
   const handleAllUsers = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const { data } = await axios.get(`${API}/users`, {
-        headers: { Authorization: Authentication_Token },
-      });
-      setAllUsers(data);
-      setLoading(false);
-      setError("");
-    } catch (error) {
-      setLoading(false);
-      setError(error);
-    }
+    const data = await handleApiRequest(
+      axios.get,
+      `${API}/users`,
+      AxiosAuthConfig
+    );
+    setAllUsers(data);
   };
 
   // -- update/block room user ---
@@ -35,9 +42,11 @@ export const UserApiFunctions = () => {
     setLoading(true);
     setError("");
     try {
-      const response = await axios.put(`${API}/room/block/${data._id}`, data, {
-        headers: { Authorization: Authentication_Token },
-      });
+      const response = await axios.put(
+        `${API}/room/block/${data._id}`,
+        data,
+        AxiosAuthConfig
+      );
       setLoading(false);
       setError("");
       return response.data;

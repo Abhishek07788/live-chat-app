@@ -7,7 +7,7 @@ import { ChatApiFunctions } from "./ChatApiFunctions";
 import { config } from "@/config/config";
 import axios, { AxiosError } from "axios";
 
-const { API, Authentication_Token } = config;
+const { API, AxiosAuthConfig } = config;
 export const RoomApiFunctions = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<AxiosError | any>();
@@ -16,49 +16,49 @@ export const RoomApiFunctions = () => {
   const { handleMessagesSeen } = ChatApiFunctions();
   const { currentUser } = useCurrentUser();
 
-  // -- join room ---
-  const JOIN_ROOM = async (chatRoom: RoomsTypes) => {
+  const handleApiRequest = async (requestFunction: any, ...args: any[]) => {
     setError("");
     setLoading(true);
     try {
-      const { data } = await axios.post(`${API}/room/join`, chatRoom, {
-        headers: { Authorization: Authentication_Token },
-      });
-      const roomID = data?.room?.roomId;
-      const isExist = data?.isExist;
+      const { data } = await requestFunction(...args);
+      setError("");
       setLoading(false);
-      if (isExist) {
-        handleMessagesSeen(chatRoom?.user1, roomID);
-        setError("");
-      }
-      roomID
-        ? router.push(`${PATHS.chat}/${roomID}`)
-        : setError({
-            message:
-              "Something went wrong from server. Please try again later!",
-          });
-      setLoading(false);
+      return data;
     } catch (error) {
-      setLoading(false);
       setError(error);
+      setLoading(false);
     }
+  };
+
+  // -- join room ---
+  const JOIN_ROOM = async (chatRoom: RoomsTypes) => {
+    const data = await handleApiRequest(
+      axios.post,
+      `${API}/room/join`,
+      chatRoom,
+      AxiosAuthConfig
+    );
+    const roomID = data?.room?.roomId;
+    const isExist = data?.isExist;
+    if (isExist) {
+      handleMessagesSeen(chatRoom?.user1, roomID);
+      setError("");
+    }
+    roomID
+      ? router.push(`${PATHS.chat}/${roomID}`)
+      : setError({
+          message: "Something went wrong from server. Please try again later!",
+        });
   };
 
   // -- get single room ---
   const handleGetSingleRoom = async (roomId: string) => {
-    setError("");
-    setLoading(true);
-    try {
-      const { data } = await axios.get(`${API}/room/${roomId}`, {
-        headers: { Authorization: Authentication_Token },
-      });
-      setLoading(false);
-      setError("");
-      setRoom(data);
-    } catch (error) {
-      setLoading(false);
-      setError(error);
-    }
+    const data = await handleApiRequest(
+      axios.get,
+      `${API}/room/${roomId}`,
+      AxiosAuthConfig
+    );
+    setRoom(data);
   };
 
   const otherUser = useMemo(() => {

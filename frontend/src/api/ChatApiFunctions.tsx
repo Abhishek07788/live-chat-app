@@ -4,7 +4,7 @@ import { useState } from "react";
 import { config } from "@/config/config";
 import axios, { AxiosError } from "axios";
 
-const { API, Authentication_Token } = config;
+const { API, AxiosAuthConfig } = config;
 export const ChatApiFunctions = () => {
   const [allMessages, setAllMessages] = useState<MessageTypes[]>([]);
   const [loading, setLoading] = useState(false);
@@ -12,20 +12,28 @@ export const ChatApiFunctions = () => {
   const [unseenCount, setUnseenCount] = useState(0);
   const [lastMsg, setLastMsg] = useState<MessageTypes>();
 
-  // -- get room messages  ---
-  const getRoomMessages = async (roomId: string) => {
+  const handleApiRequest = async (requestFunction: any, ...args: any[]) => {
     setError("");
     setLoading(true);
     try {
-      const { data } = await axios.get(`${API}/msg/${roomId}`, {
-        headers: { Authorization: Authentication_Token },
-      });
-      setAllMessages(data);
+      const { data } = await requestFunction(...args);
+      setError("");
       setLoading(false);
+      return data;
     } catch (error) {
-      setLoading(false);
       setError(error);
+      setLoading(false);
     }
+  };
+
+  // -- get room messages  ---
+  const getRoomMessages = async (roomId: string) => {
+    const data = await handleApiRequest(
+      axios.get,
+      `${API}/msg/${roomId}`,
+      AxiosAuthConfig
+    );
+    setAllMessages(data);
   };
 
   // -- send messages ---
@@ -33,67 +41,43 @@ export const ChatApiFunctions = () => {
     newMessage: MessageTypes,
     setMessage: (message: string) => void
   ) => {
-    setLoading(true);
+    const data = await handleApiRequest(
+      axios.post,
+      `${API}/msg`,
+      newMessage,
+      AxiosAuthConfig
+    );
+    setAllMessages((prevMessages) => [...prevMessages, data]);
+    socket.emit("send-message", data);
     setMessage("");
-    setError("");
-    try {
-      const { data } = await axios.post(`${API}/msg`, newMessage, {
-        headers: { Authorization: Authentication_Token },
-      });
-      setAllMessages((prevMessages) => [...prevMessages, data]);
-      socket.emit("send-message", data);
-      setLoading(false);
-      setMessage("");
-    } catch (error) {
-      setLoading(false);
-      setError(error);
-    }
   };
 
   // -- set messages seen  ---
   const handleMessagesSeen = async (userId: string, roomId: string) => {
-    setError("");
-    setLoading(true);
-    try {
-      await axios.patch(
-        `${API}/msg/seen`,
-        {
-          userId,
-          roomId,
-        },
-        {
-          headers: { Authorization: Authentication_Token },
-        }
-      );
-      setError("");
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      setError(error);
-    }
+    await handleApiRequest(
+      axios.patch,
+      `${API}/msg/seen`,
+      {
+        userId,
+        roomId,
+      },
+      AxiosAuthConfig
+    );
   };
 
   // -- get unseen count messages ---
   const getUnseenMessages = async (userId: string, roomId: string) => {
-    setError("");
-    setLoading(true);
-    try {
-      const { data } = await axios.post(
-        `${API}/msg/unseen/count`,
-        {
-          userId,
-          roomId,
-        },
-        {
-          headers: { Authorization: Authentication_Token },
-        }
-      );
-      setUnseenCount(data.count);
-      setLastMsg(data.lastMsg);
-    } catch (error) {
-      setLoading(false);
-      setError(error);
-    }
+    const data = await handleApiRequest(
+      axios.post,
+      `${API}/msg/unseen/count`,
+      {
+        userId,
+        roomId,
+      },
+      AxiosAuthConfig
+    );
+    setUnseenCount(data.count);
+    setLastMsg(data.lastMsg);
   };
 
   return {
