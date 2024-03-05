@@ -125,25 +125,4 @@ app.delete("/:id", middleware, async (req, res) => {
   }
 });
 
-// -- update or block user ----
-app.put("/seen/:id", middleware, async (req, res) => {
-  try {
-    const msg = await Message.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    }).populate("currentUser", "-password");
-    if (!msg) {
-      return res
-        .status(201)
-        .send({ message: "Message not found", status: false });
-    } else {
-      return res
-        .status(200)
-        .send({ msg, message: "Message Updated", status: true });
-    }
-  } catch (error) {
-    console.error("Error:", error.message);
-    res.status(400).send({ message: error.message });
-  }
-});
-
 module.exports = app;
