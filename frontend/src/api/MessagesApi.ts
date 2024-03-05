@@ -2,12 +2,12 @@ import axios from "axios";
 import { config } from "./config";
 import { MessageTypes } from "@/globle";
 
-const { Backend_Api, Authentication_Token } = config;
+const { API, Authentication_Token } = config;
 
 // -- send messages ---
 export const sendMessage = async (data: MessageTypes) => {
   try {
-    const response = await axios.post(`${Backend_Api}/msg`, data, {
+    const response = await axios.post(`${API}/msg`, data, {
       headers: { Authorization: Authentication_Token },
     });
     return response.data;
@@ -19,7 +19,7 @@ export const sendMessage = async (data: MessageTypes) => {
 // -- get room messages  ---
 export const getRoomMessages = async (roomId: string) => {
   try {
-    const response = await axios.get(`${Backend_Api}/msg/${roomId}`, {
+    const response = await axios.get(`${API}/msg/${roomId}`, {
       headers: { Authorization: Authentication_Token },
     });
     return response.data;
@@ -32,7 +32,7 @@ export const getRoomMessages = async (roomId: string) => {
 export const handleMessagesSeen = async (userId: string, roomId: string) => {
   try {
     const response = await axios.patch(
-      `${Backend_Api}/msg/seen`,
+      `${API}/msg/seen`,
       {
         userId,
         roomId,
@@ -54,7 +54,7 @@ export const getUnseenMessagesAndCount = async (
 ) => {
   try {
     const response = await axios.post(
-      `${Backend_Api}/msg/unseen/count`,
+      `${API}/msg/unseen/count`,
       {
         userId,
         roomId,
