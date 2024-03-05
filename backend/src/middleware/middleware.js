@@ -4,16 +4,20 @@ const middleware = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
     if (!token) {
-      return res
-        .status(201)
-        .send({ message: "Unauthorized: Token not provided" });
+      return res.status(201).send({
+        type: "AUTH",
+        message: "Unauthorized: Login details not provided",
+      });
     }
 
     const user = await User.findOne({ userName: token });
     if (user) {
       next();
     } else {
-      return res.status(201).send({ message: "Unauthorized: Invalid token" });
+      return res.status(201).send({
+        type: "AUTH",
+        message: "Unauthorized: Invalid Login details!",
+      });
     }
   } catch (error) {
     console.error("Error in middleware:", error.message);

@@ -23,7 +23,7 @@ const Navbar = () => {
     },
     {
       name: "Chat",
-      path: currentUser?.userName ? PATHS.chat : PATHS.root,
+      path: PATHS.chat,
     },
     {
       name: "Pdf Render",

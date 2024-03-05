@@ -35,8 +35,8 @@ const UsersList = () => {
     return <Loading />;
   }
 
-  if (!loading && error) {
-    return <NotFound title={error || "Server Error!"} />;
+  if ((!loading && error) || roomError) {
+    return <NotFound title={roomError || "Server Error!"} />;
   }
 
   return (

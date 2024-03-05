@@ -1,3 +1,4 @@
+import NotFound from "@/Layout/NotFound";
 import { socket } from "@/api/config";
 import { ChatApiFunctions } from "@/common/ChatApiFunctions";
 import { UsersTypes } from "@/globle";

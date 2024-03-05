@@ -14,11 +14,14 @@ export const UserApiFunctions = () => {
 
   const handleAllUsers = () => {
     setLoading(true);
+    setError("");
     getAllUsers()
       .then((users) => {
         setAllUsers(users);
-        setError(users.message);
         setLoading(false);
+        {
+          users?.type === "AUTH" && setError(users.message);
+        }
       })
       .catch((error) => {
         console.error("error: ", error.message);
@@ -33,6 +36,8 @@ export const UserApiFunctions = () => {
     userId: string
   ) => {
     setLoading(true);
+    setError("");
+
     if (room.blocked && userId) {
       let updatedBlockedArray;
       if (room?.blocked.includes(userId)) {
@@ -48,10 +53,14 @@ export const UserApiFunctions = () => {
       socket.emit("set-block-user", updatedObj);
       handleBlockRoomUser(updatedObj)
         .then((updatedRoom) => {
+          {
+            updatedRoom?.type === "AUTH" && setError(updatedRoom.message);
+          }
           setRoom(updatedRoom.room);
         })
         .catch((error) => {
           console.error("error: ", error.message);
+          setError(error.message);
           setLoading(false);
         });
     }

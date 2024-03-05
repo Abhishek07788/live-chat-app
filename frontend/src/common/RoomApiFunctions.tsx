@@ -8,17 +8,21 @@ import { ChatApiFunctions } from "./ChatApiFunctions";
 
 export const RoomApiFunctions = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
+
   const [room, setRoom] = useState<RoomsTypes>();
   const router = useRouter();
   const { SeenAllMessages } = ChatApiFunctions();
   const { currentUser } = useCurrentUser();
 
   const JOIN_ROOM = (chatRoom: RoomsTypes) => {
-    setError(false);
+    setError("");
     setLoading(true);
     handleJoinRoom(chatRoom)
       .then((data) => {
+        {
+          data?.type === "AUTH" && setError(data.message);
+        }
         const roomID = data?.room?.roomId;
         const isExist = data?.isExist;
         if (isExist) {
@@ -27,28 +31,31 @@ export const RoomApiFunctions = () => {
         roomID
           ? router.push(`${PATHS.chat}/${roomID}`)
           : alert("Something went wrong. Please try again!");
-        setError(false);
+
         setLoading(false);
       })
       .catch((error) => {
-        console.error("error: ", error);
+        console.error("error: ", error.message);
         setLoading(false);
-        setError(true);
+        setError(error.message);
       });
   };
 
   const handleGetSingleRoom = (roomId: string) => {
-    setError(false);
+    setError("");
     setLoading(true);
     getSingleRoom(roomId)
       .then((room) => {
         setRoom(room);
-        setError(false);
+        {
+          room?.type === "AUTH" && setError(room.message);
+        }
         setLoading(false);
       })
       .catch((error) => {
+        console.error("error: ", error.message);
         setLoading(false);
-        setError(true);
+        setError(error.message);
       });
   };
 

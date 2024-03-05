@@ -20,6 +20,7 @@ const Chatting = ({ roomId }: { roomId: string }) => {
   const [message, setMessage] = useState<string>("");
   const {
     loading: ChatLoading,
+    error: ChatError,
     allMessages,
     handleGetAllChats,
     handleSendMessage,
@@ -86,8 +87,8 @@ const Chatting = ({ roomId }: { roomId: string }) => {
     return <Loading />;
   }
 
-  if (!loading && error) {
-    return <NotFound />;
+  if ((!loading && error) || ChatError) {
+    return <NotFound title={error} />;
   }
 
   const handleChange = (e: any) => {
