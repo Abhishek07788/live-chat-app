@@ -13,7 +13,7 @@ const NotFound = ({ title }: { title?: string }) => {
       mt={4}
     >
       <Typography variant="h4" textAlign={"center"}>
-        {title || "Not Found"}
+        {title || "Something went wrong!"}
       </Typography>
       <img
         src={assetPaths.defaultImage.notFound}

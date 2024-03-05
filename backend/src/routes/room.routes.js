@@ -91,7 +91,7 @@ app.put("/block/:id", middleware, async (req, res) => {
         .send({ room, message: "Room Updated", status: true });
     }
   } catch (error) {
-    console.error("Error:", error.message);
+    console.log("Error:", error.message);
     res.status(400).send({ message: error.message });
   }
 });

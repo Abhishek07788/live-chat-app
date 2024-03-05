@@ -2,7 +2,7 @@ import { OtherUsersTypes, RoomsTypes, UsersTypes } from "@/globle";
 import { Avatar, Grid, Stack, Typography } from "@mui/material";
 import React, { memo } from "react";
 import MoreOptions from "../common/MoreOptions";
-import { UserApiFunctions } from "@/common/UserApiFunction";
+import { UserApiFunctions } from "@/api/UserApiFunction";
 
 const ChatHeader = ({
   isTyping,

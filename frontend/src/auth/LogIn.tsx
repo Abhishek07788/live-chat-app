@@ -1,30 +1,43 @@
-"use client";
-import { handleLogin } from "@/api/UserApi";
+import { config } from "@/config/config";
+import LoadingButton from "@/components/common/LoadingButton";
 import useCurrentUser from "@/hooks/useCurrentUser";
-import { Button, Grid, TextField } from "@mui/material";
+import { Grid, TextField } from "@mui/material";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 const Login = () => {
   const { setCurrentUser } = useCurrentUser();
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  const handleSubmitUser = (e: React.FormEvent) => {
+  const handleSubmitUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    handleLogin({ userName, password }).then((user) => {
-      if (user.status) {
+    setError("");
+    setLoading(false);
+    try {
+      const { data } = await axios.post(`${config.API}/users/login`, {
+        userName,
+        password,
+      });
+      if (data.status) {
         router.push("/chat", { scroll: false });
-        setCurrentUser(user.user);
-        localStorage.setItem("currentUser", JSON.stringify(user.user));
+        setCurrentUser(data.user);
+        localStorage.setItem("currentUser", JSON.stringify(data.user));
         setUserName("");
         setPassword("");
+        setError("");
+        setLoading(false);
       } else {
-        setError(user.message);
+        setError(data.message);
       }
-    });
+    } catch (error) {
+      setLoading(false);
+      setError("Server Error!");
+    }
   };
 
   return (
@@ -67,15 +80,15 @@ const Login = () => {
           setError("");
         }}
       />
-      <Button
+      <LoadingButton
+        loading={loading}
         fullWidth
-        size="small"
-        variant="contained"
         color="primary"
+        type={"submit"}
         onClick={handleSubmitUser}
       >
         Login
-      </Button>
+      </LoadingButton>
     </Grid>
   );
 };

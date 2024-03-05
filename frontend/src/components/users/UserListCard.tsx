@@ -1,6 +1,6 @@
 import NotFound from "@/Layout/NotFound";
-import { socket } from "@/api/config";
-import { ChatApiFunctions } from "@/common/ChatApiFunctions";
+import { socket } from "@/config/config";
+import { ChatApiFunctions } from "@/api/ChatApiFunctions";
 import { UsersTypes } from "@/globle";
 import { Avatar, Chip, Grid, Stack, Typography } from "@mui/material";
 import React, { useEffect } from "react";

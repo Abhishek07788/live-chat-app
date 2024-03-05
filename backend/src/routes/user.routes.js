@@ -45,7 +45,7 @@ app.get("/", async (req, res) => {
     const count = await User.countDocuments({});
     res.status(200).send({ users, count });
   } catch (error) {
-    console.error("Error fetching all users:", error.message);
+    console.log("Error fetching all users:", error.message);
     res.status(500).send({ message: "Internal server error" });
   }
 });

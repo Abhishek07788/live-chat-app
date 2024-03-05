@@ -1,4 +1,4 @@
-import { socket } from "@/api/config";
+import { socket } from "@/config/config";
 import useCurrentUser from "@/hooks/useCurrentUser";
 
 export const AllSockets = (roomId: string) => {

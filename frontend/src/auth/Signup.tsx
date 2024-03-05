@@ -1,20 +1,23 @@
 "use client";
-import { handleSignUp } from "@/api/UserApi";
+import { config } from "@/config/config";
+import LoadingButton from "@/components/common/LoadingButton";
 import { UsersTypes } from "@/globle";
 import useCurrentUser from "@/hooks/useCurrentUser";
-import { Button, Grid, TextField } from "@mui/material";
+import { Grid, TextField } from "@mui/material";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 const Signup = () => {
   const { setCurrentUser } = useCurrentUser();
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  const handleSubmitUser = (e: React.FormEvent) => {
+  const handleSubmitUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (userName.length < 3) {
       setError("user must have at least 3 characters!");
@@ -25,18 +28,27 @@ const Signup = () => {
       return;
     }
     const user: UsersTypes = { name, userName, password };
-    handleSignUp(user).then((singleUser) => {
-      if (singleUser.status) {
-        localStorage.setItem("currentUser", JSON.stringify(singleUser.user));
-        setCurrentUser(singleUser.user);
+
+    setLoading(true);
+    setError("");
+    try {
+      const { data } = await axios.post(`${config.API}/users/signup`, user);
+      if (data.status) {
+        localStorage.setItem("currentUser", JSON.stringify(data.user));
+        setCurrentUser(data.user);
         router.push("/chat", { scroll: false });
         setName("");
         setPassword("");
         setUserName("");
+        setLoading(false);
       } else {
-        setError(singleUser.message);
+        setLoading(false);
+        setError(data.message);
       }
-    });
+    } catch (error) {
+      setLoading(false);
+      setError("Server Error!");
+    }
   };
 
   return (
@@ -94,15 +106,15 @@ const Signup = () => {
           setError("");
         }}
       />
-      <Button
+      <LoadingButton
+        loading={loading}
         fullWidth
-        size="small"
-        variant="contained"
         color="primary"
+        type={"submit"}
         onClick={handleSubmitUser}
       >
         Sign up
-      </Button>
+      </LoadingButton>
     </Grid>
   );
 };

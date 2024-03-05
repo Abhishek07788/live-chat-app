@@ -1,4 +1,4 @@
-import { socket } from "@/api/config";
+import { socket } from "@/config/config";
 import { OnlineTypes, TypingTypes } from "@/globle";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import React, { useState } from "react";

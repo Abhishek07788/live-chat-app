@@ -8,11 +8,11 @@ import ChatFooter from "./ChatFooter";
 import ChatHeader from "./ChatHeader";
 import NotFound from "@/Layout/NotFound";
 import Loading from "@/Layout/Loading";
-import { ChatApiFunctions } from "@/common/ChatApiFunctions";
-import { RoomApiFunctions } from "@/common/RoomApiFunctions";
-import { TypingAndOnline } from "@/common/TypingAndOnline";
+import { ChatApiFunctions } from "@/api/ChatApiFunctions";
+import { RoomApiFunctions } from "@/api/RoomApiFunctions";
+import { TypingAndOnline } from "@/api/TypingAndOnline";
 import { AllSockets } from "@/socket.io/AllSockets";
-import { socket } from "@/api/config";
+import { socket } from "@/config/config";
 
 const Chatting = ({ roomId }: { roomId: string }) => {
   const { currentUser } = useCurrentUser();
@@ -22,10 +22,10 @@ const Chatting = ({ roomId }: { roomId: string }) => {
     loading: ChatLoading,
     error: ChatError,
     allMessages,
-    handleGetAllChats,
+    getRoomMessages,
     handleSendMessage,
     setAllMessages,
-    SeenAllMessages,
+    handleMessagesSeen,
     getUnseenMessages,
     unseenCount,
   } = ChatApiFunctions();
@@ -38,7 +38,7 @@ const Chatting = ({ roomId }: { roomId: string }) => {
   useEffect(() => {
     socket.emit("join-room", { roomId, currentUser });
     handleGetSingleRoom(roomId);
-    handleGetAllChats(roomId);
+    getRoomMessages(roomId);
     getUnseenMessages(currentUser?._id, roomId);
     socket.on("get-message", (msg) => {
       setAllMessages((prevMessages) => [...prevMessages, msg]);
@@ -67,7 +67,7 @@ const Chatting = ({ roomId }: { roomId: string }) => {
 
   useEffect(() => {
     if (isOnline && otherUser) {
-      SeenAllMessages(otherUser?._id, roomId);
+      handleMessagesSeen(otherUser?._id, roomId);
     }
   }, [isOnline, otherUser]);
 
@@ -82,14 +82,6 @@ const Chatting = ({ roomId }: { roomId: string }) => {
       }
     }
   }, [allMessages]);
-
-  if (loading && ChatLoading && !roomId && !room) {
-    return <Loading />;
-  }
-
-  if ((!loading && error) || ChatError) {
-    return <NotFound title={error} />;
-  }
 
   const handleChange = (e: any) => {
     setMessage(e.target.value);
@@ -116,6 +108,14 @@ const Chatting = ({ roomId }: { roomId: string }) => {
     SET_TYPING(false);
     socket.emit("set-unSeen", { newMessage, unseenCount: unseenCount + 1 });
   };
+
+  if (loading && ChatLoading && !roomId && !room) {
+    return <Loading />;
+  }
+
+  if (error || ChatError) {
+    return <NotFound title={error.message || ChatError.message} />;
+  }
 
   return (
     <Grid

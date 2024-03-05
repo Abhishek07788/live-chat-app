@@ -1,8 +1,8 @@
 "use client";
 import Loading from "@/Layout/Loading";
 import NotFound from "@/Layout/NotFound";
-import { RoomApiFunctions } from "@/common/RoomApiFunctions";
-import { UserApiFunctions } from "@/common/UserApiFunction";
+import { RoomApiFunctions } from "@/api/RoomApiFunctions";
+import { UserApiFunctions } from "@/api/UserApiFunction";
 import { RoomsTypes, UsersTypes } from "@/globle";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { Grid, Typography } from "@mui/material";
@@ -11,7 +11,7 @@ import UserListCard from "./UserListCard";
 
 const UsersList = () => {
   const { currentUser } = useCurrentUser();
-  const { loading, error, allUsers, handleAllUsers } = UserApiFunctions();
+  const { loading, allUsers, handleAllUsers } = UserApiFunctions();
   const {
     loading: roomLoading,
     error: roomError,
@@ -35,13 +35,13 @@ const UsersList = () => {
     return <Loading />;
   }
 
-  if ((!loading && error) || roomError) {
-    return <NotFound title={roomError || "Server Error!"} />;
+  if (!loading && !roomLoading && roomError) {
+    return <NotFound title={roomError.message || "Server Error!"} />;
   }
 
   return (
     <>
-      {allUsers.count === 0 ? (
+      {!loading && allUsers.count === 0 ? (
         <NotFound title="User Not Found!" />
       ) : (
         <>

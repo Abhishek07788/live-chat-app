@@ -20,7 +20,7 @@ function CustomTabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
   return (
-    <div
+    <Grid
       role="tabpanel"
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
@@ -29,10 +29,10 @@ function CustomTabPanel(props: TabPanelProps) {
     >
       {value === index && (
         <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
+          <Grid>{children}</Grid>
         </Box>
       )}
-    </div>
+    </Grid>
   );
 }
 
@@ -80,7 +80,7 @@ const Register = () => {
             <span style={{ color: "#8256e7" }}>{currentUser.name}</span>?
           </Typography>
           <Button
-            fullWidth 
+            fullWidth
             variant="contained"
             sx={{ margin: "auto", my: 2 }}
             onClick={handleLogOut}
