@@ -51,7 +51,7 @@ app.get("/", middleware, async (req, res) => {
 });
 
 // --- get one user --
-app.get("/:id", async (req, res) => {
+app.get("/:id", middleware, async (req, res) => {
   try {
     const singleUser = await User.findById(req.params.id);
     if (!singleUser) {
@@ -64,7 +64,7 @@ app.get("/:id", async (req, res) => {
 });
 
 // --- delete one user --
-app.delete("/:id", async (req, res) => {
+app.delete("/:id", middleware, async (req, res) => {
   try {
     const deletedUser = await User.findByIdAndDelete(req.params.id);
     if (!deletedUser) {

@@ -1,10 +1,11 @@
 const express = require("express");
 const Room = require("../schemas/room.schema");
+const middleware = require("../middleware/middleware");
 
 const app = express.Router();
 
 // -- create room ----
-app.post("/join", async (req, res) => {
+app.post("/join", middleware, async (req, res) => {
   const { roomId } = req.body;
   try {
     // Check if the room already exists
@@ -33,7 +34,7 @@ app.post("/join", async (req, res) => {
 });
 
 // -- get one room ----
-app.get("/:roomId", async (req, res) => {
+app.get("/:roomId", middleware, async (req, res) => {
   const { roomId } = req.params;
   try {
     // Check if the room already exists
@@ -51,7 +52,7 @@ app.get("/:roomId", async (req, res) => {
 });
 
 // -- getAll rooms ----
-app.get("/", async (req, res) => {
+app.get("/", middleware, async (req, res) => {
   try {
     const room = await Room.find({}).populate("user1 user2", "-password");
     return res.status(200).send(room);
@@ -62,7 +63,7 @@ app.get("/", async (req, res) => {
 });
 
 // -- delete rooms ----
-app.delete("/:id", async (req, res) => {
+app.delete("/:id", middleware, async (req, res) => {
   try {
     const deletedRoom = await Room.findByIdAndDelete(req.params.id);
     if (!deletedRoom) {
@@ -77,7 +78,7 @@ app.delete("/:id", async (req, res) => {
 });
 
 // -- update or block user ----
-app.put("/block/:id", async (req, res) => {
+app.put("/block/:id", middleware, async (req, res) => {
   try {
     const room = await Room.findByIdAndUpdate(req.params.id, req.body, {
       new: true,

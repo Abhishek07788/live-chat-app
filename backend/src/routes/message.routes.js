@@ -1,10 +1,11 @@
 const express = require("express");
 const Message = require("../schemas/messages.schema");
+const middleware = require("../middleware/middleware");
 
 const app = express.Router();
 
 // -- create Message ----
-app.post("/", async (req, res) => {
+app.post("/", middleware, async (req, res) => {
   try {
     const createMsg = await Message.create(req.body);
     const msg = await Message.findOne({ _id: createMsg._id }).populate([
@@ -18,7 +19,7 @@ app.post("/", async (req, res) => {
 });
 
 // -- get room Message ----
-app.get("/:roomId", async (req, res) => {
+app.get("/:roomId", middleware, async (req, res) => {
   const { roomId } = req.params;
   try {
     // Check if the Message already exists
@@ -36,7 +37,7 @@ app.get("/:roomId", async (req, res) => {
 });
 
 // -- getAll Message ----
-app.get("/", async (req, res) => {
+app.get("/", middleware, async (req, res) => {
   try {
     const msg = await Message.find({}).populate("currentUser", "-password");
     return res.status(200).send(msg);
@@ -47,7 +48,7 @@ app.get("/", async (req, res) => {
 });
 
 // --- seen the messages --
-app.patch("/seen", async (req, res) => {
+app.patch("/seen", middleware, async (req, res) => {
   const { userId, roomId } = req.body;
   try {
     await Message.updateMany(
@@ -76,7 +77,7 @@ app.patch("/seen", async (req, res) => {
 });
 
 // -- getAll unSeen Messages ----
-app.post("/unseen/count", async (req, res) => {
+app.post("/unseen/count", middleware, async (req, res) => {
   const { userId, roomId } = req.body;
   try {
     const count = await Message.countDocuments({
@@ -108,7 +109,7 @@ app.post("/unseen/count", async (req, res) => {
 });
 
 // -- delete Message ----
-app.delete("/:id", async (req, res) => {
+app.delete("/:id", middleware, async (req, res) => {
   try {
     const deletedMsg = await Message.findByIdAndDelete(req.params.id);
     if (!deletedMsg) {
@@ -125,7 +126,7 @@ app.delete("/:id", async (req, res) => {
 });
 
 // -- update or block user ----
-app.put("/seen/:id", async (req, res) => {
+app.put("/seen/:id", middleware, async (req, res) => {
   try {
     const msg = await Message.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
