@@ -62,7 +62,11 @@ export const ChatApiFunctions = () => {
       },
       AxiosAuthConfig
     );
-    setAllMessages(data.msg);
+    if (data && data.msg) {
+      setAllMessages(data.msg);
+    } else {
+      setError("");
+    }
   };
 
   // -- get unseen count messages ---

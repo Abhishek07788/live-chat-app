@@ -37,7 +37,7 @@ app.post("/login", async (req, res) => {
 });
 
 // --- get all users --
-app.get("/", async (req, res) => {
+app.get("/", middleware, async (req, res) => {
   try {
     const users = await User.find({})
       .sort({ createdAt: -1 })
