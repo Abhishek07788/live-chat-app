@@ -80,8 +80,12 @@ export const ChatApiFunctions = () => {
       },
       AxiosAuthConfig
     );
-    setUnseenCount(data?.count);
-    setLastMsg(data.lastMsg);
+    if (data || data?.count) {
+      setUnseenCount(data?.count);
+      setLastMsg(data?.lastMsg);
+    } else {
+      setError("");
+    }
   };
 
   return {

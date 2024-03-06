@@ -114,8 +114,8 @@ const Chatting = ({ roomId }: { roomId: string }) => {
     return <Loading />;
   }
 
-  if (error) {
-    return <NotFound title={error.message} />;
+  if (error || ChatError) {
+    return <NotFound title={error.message || ChatError.message} />;
   }
 
   return (
