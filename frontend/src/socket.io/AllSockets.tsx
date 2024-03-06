@@ -1,8 +1,9 @@
-import { socket } from "@/config/config";
+import { useConfig } from "@/config/Config";
 import useCurrentUser from "@/hooks/useCurrentUser";
 
 export const AllSockets = (roomId: string) => {
   const { currentUser } = useCurrentUser();
+  const { socket } = useConfig();
 
   const JOIN_ROOM = () => {
     socket.emit("join-room", { roomId, currentUser });

@@ -1,6 +1,6 @@
 "use client";
-import { config } from "@/config/config";
 import LoadingButton from "@/components/common/LoadingButton";
+import { useConfig } from "@/config/Config";
 import { UsersTypes } from "@/globle";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { Grid, TextField } from "@mui/material";
@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 const Signup = () => {
+  const { API } = useConfig();
   const { setCurrentUser } = useCurrentUser();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,7 +33,7 @@ const Signup = () => {
     setLoading(true);
     setError("");
     try {
-      const { data } = await axios.post(`${config.API}/users/signup`, user);
+      const { data } = await axios.post(`${API}/users/signup`, user);
       if (data.status) {
         localStorage.setItem("currentUser", JSON.stringify(data.user));
         setCurrentUser(data.user);

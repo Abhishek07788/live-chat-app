@@ -1,5 +1,4 @@
-import NotFound from "@/Layout/NotFound";
-import { socket } from "@/config/config";
+import { useConfig } from "@/config/Config";
 import { ChatApiFunctions } from "@/api/ChatApiFunctions";
 import { UsersTypes } from "@/globle";
 import { Avatar, Chip, Grid, Stack, Typography } from "@mui/material";
@@ -16,6 +15,7 @@ const UserListCard = ({
   handleUserClick: (user: UsersTypes) => void;
   currentUser: UsersTypes;
 }) => {
+  const { socket } = useConfig();
   const { getUnseenMessages, unseenCount, lastMsg } = ChatApiFunctions();
   const [roomID, setRoomID] = React.useState(
     [user._id, currentUser._id].sort().join("")

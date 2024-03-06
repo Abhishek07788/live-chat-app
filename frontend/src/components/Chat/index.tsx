@@ -12,9 +12,10 @@ import { ChatApiFunctions } from "@/api/ChatApiFunctions";
 import { RoomApiFunctions } from "@/api/RoomApiFunctions";
 import { TypingAndOnline } from "@/api/TypingAndOnline";
 import { AllSockets } from "@/socket.io/AllSockets";
-import { socket } from "@/config/config";
+import { useConfig } from "@/config/Config";
 
 const Chatting = ({ roomId }: { roomId: string }) => {
+  const { socket } = useConfig();
   const { currentUser } = useCurrentUser();
   const listRef = useRef<HTMLDivElement | null>(null);
   const [message, setMessage] = useState<string>("");

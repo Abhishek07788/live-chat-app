@@ -1,11 +1,10 @@
-import { socket } from "@/config/config";
+import { useConfig } from "@/config/Config";
 import { MessageTypes } from "@/globle";
 import { useState } from "react";
-import { config } from "@/config/config";
 import axios, { AxiosError } from "axios";
 
-const { API, AxiosAuthConfig } = config;
 export const ChatApiFunctions = () => {
+  const { API, AxiosAuthConfig, socket } = useConfig();
   const [allMessages, setAllMessages] = useState<MessageTypes[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<AxiosError | any>();

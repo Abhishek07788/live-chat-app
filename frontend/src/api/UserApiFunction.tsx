@@ -1,11 +1,10 @@
-import { socket } from "@/config/config";
+import { useConfig } from "@/config/Config";
 import { AllUsersTypes, RoomsTypes } from "@/globle";
 import { useState } from "react";
-import { config } from "@/config/config";
 import axios, { AxiosError } from "axios";
 
-const { API, AxiosAuthConfig } = config;
 export const UserApiFunctions = () => {
+  const { socket, API, AxiosAuthConfig } = useConfig();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<AxiosError | any>();
   const [allUsers, setAllUsers] = useState<AllUsersTypes>({

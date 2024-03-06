@@ -4,11 +4,11 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { ChatApiFunctions } from "./ChatApiFunctions";
-import { config } from "@/config/config";
 import axios, { AxiosError } from "axios";
+import { useConfig } from "@/config/Config";
 
-const { API, AxiosAuthConfig } = config;
 export const RoomApiFunctions = () => {
+  const { API, AxiosAuthConfig } = useConfig();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<AxiosError | any>();
   const [room, setRoom] = useState<RoomsTypes>();
