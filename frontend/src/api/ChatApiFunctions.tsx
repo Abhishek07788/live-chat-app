@@ -54,7 +54,7 @@ export const ChatApiFunctions = () => {
 
   // -- set messages seen  ---
   const handleMessagesSeen = async (userId: string, roomId: string) => {
-    await handleApiRequest(
+    const data = await handleApiRequest(
       axios.patch,
       `${API}/msg/seen`,
       {
@@ -63,6 +63,7 @@ export const ChatApiFunctions = () => {
       },
       AxiosAuthConfig
     );
+    setAllMessages(data.msg);
   };
 
   // -- get unseen count messages ---
@@ -76,7 +77,7 @@ export const ChatApiFunctions = () => {
       },
       AxiosAuthConfig
     );
-    setUnseenCount(data.count);
+    setUnseenCount(data?.count);
     setLastMsg(data.lastMsg);
   };
 
