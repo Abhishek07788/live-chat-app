@@ -69,6 +69,10 @@ app.patch("/seen", middleware, async (req, res) => {
       return res
         .status(200)
         .send({ msg, status: true, message: "Message Seen!" });
+    } else {
+      return res
+        .status(200)
+        .send({ msg: {}, status: false, message: "Message Not Found!" });
     }
   } catch (error) {
     console.log("error: ", error.message);
@@ -100,7 +104,7 @@ app.post("/unseen/count", middleware, async (req, res) => {
     } else {
       return res
         .status(200)
-        .send({ count, lastMsg: {}, status: false, message: "No message" });
+        .send({ count: 0, lastMsg: {}, status: false, message: "No message" });
     }
   } catch (error) {
     console.log("error: ", error.message);

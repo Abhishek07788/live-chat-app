@@ -1,4 +1,4 @@
-import { useConfig } from "@/config/Config";
+import { useConfig } from "@/config/useConfig";
 import { AllUsersTypes, RoomsTypes } from "@/globle";
 import { useState } from "react";
 import axios, { AxiosError } from "axios";

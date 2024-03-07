@@ -1,10 +1,10 @@
-import { useConfig } from "@/config/Config";
+import { socket, useConfig } from "@/config/useConfig";
 import { MessageTypes } from "@/globle";
 import { useState } from "react";
 import axios, { AxiosError } from "axios";
 
 export const ChatApiFunctions = () => {
-  const { API, AxiosAuthConfig, socket } = useConfig();
+  const { API, AxiosAuthConfig } = useConfig();
   const [allMessages, setAllMessages] = useState<MessageTypes[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<AxiosError | any>();
@@ -62,10 +62,8 @@ export const ChatApiFunctions = () => {
       },
       AxiosAuthConfig
     );
-    if (data && data.msg) {
+    if (data && data.status) {
       setAllMessages(data.msg);
-    } else {
-      setError("");
     }
   };
 
@@ -80,11 +78,9 @@ export const ChatApiFunctions = () => {
       },
       AxiosAuthConfig
     );
-    if (data || data?.count) {
+    if (data?.status) {
       setUnseenCount(data?.count);
       setLastMsg(data?.lastMsg);
-    } else {
-      setError("");
     }
   };
 

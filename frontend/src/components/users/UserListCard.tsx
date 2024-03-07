@@ -1,5 +1,5 @@
-import { useConfig } from "@/config/Config";
 import { ChatApiFunctions } from "@/api/ChatApiFunctions";
+import { socket } from "@/config/useConfig";
 import { UsersTypes } from "@/globle";
 import { Avatar, Chip, Grid, Stack, Typography } from "@mui/material";
 import React, { useEffect } from "react";
@@ -15,7 +15,6 @@ const UserListCard = ({
   handleUserClick: (user: UsersTypes) => void;
   currentUser: UsersTypes;
 }) => {
-  const { socket } = useConfig();
   const { getUnseenMessages, unseenCount, lastMsg } = ChatApiFunctions();
   const [roomID, setRoomID] = React.useState(
     [user._id, currentUser._id].sort().join("")
@@ -27,7 +26,10 @@ const UserListCard = ({
     if (user._id) {
       getUnseenMessages(user._id, roomID);
     }
-  }, []);
+    return () => {
+      socket.off("get-unSeen");
+    };
+  }, [user._id, roomID]);
 
   return (
     <Stack

@@ -1,4 +1,4 @@
-import { useConfig } from "@/config/Config";
+import { socket } from "@/config/useConfig";
 import { OnlineTypes, TypingTypes } from "@/globle";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { useState } from "react";
@@ -6,7 +6,6 @@ import { useState } from "react";
 let typingTimeout: any;
 
 export const TypingAndOnline = (roomId: string) => {
-  const { socket } = useConfig();
   const { currentUser } = useCurrentUser();
   const [TypingInfo, setTypingInfo] = useState<TypingTypes>({
     roomId,

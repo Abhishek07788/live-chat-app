@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { ChatApiFunctions } from "./ChatApiFunctions";
 import axios, { AxiosError } from "axios";
-import { useConfig } from "@/config/Config";
+import { useConfig } from "@/config/useConfig";
 
 export const RoomApiFunctions = () => {
   const { API, AxiosAuthConfig } = useConfig();

@@ -12,10 +12,9 @@ import { ChatApiFunctions } from "@/api/ChatApiFunctions";
 import { RoomApiFunctions } from "@/api/RoomApiFunctions";
 import { TypingAndOnline } from "@/api/TypingAndOnline";
 import { AllSockets } from "@/socket.io/AllSockets";
-import { useConfig } from "@/config/Config";
+import { socket } from "@/config/useConfig";
 
 const Chatting = ({ roomId }: { roomId: string }) => {
-  const { socket } = useConfig();
   const { currentUser } = useCurrentUser();
   const listRef = useRef<HTMLDivElement | null>(null);
   const [message, setMessage] = useState<string>("");
@@ -27,7 +26,6 @@ const Chatting = ({ roomId }: { roomId: string }) => {
     handleSendMessage,
     setAllMessages,
     handleMessagesSeen,
-    getUnseenMessages,
     unseenCount,
   } = ChatApiFunctions();
   const { handleGetSingleRoom, error, loading, setRoom, room, otherUser } =
@@ -40,7 +38,6 @@ const Chatting = ({ roomId }: { roomId: string }) => {
     socket.emit("join-room", { roomId, currentUser });
     handleGetSingleRoom(roomId);
     getRoomMessages(roomId);
-    getUnseenMessages(currentUser?._id, roomId);
     socket.on("get-message", (msg) => {
       setAllMessages((prevMessages) => [...prevMessages, msg]);
     });

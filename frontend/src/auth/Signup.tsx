@@ -1,6 +1,6 @@
 "use client";
 import LoadingButton from "@/components/common/LoadingButton";
-import { useConfig } from "@/config/Config";
+import { useConfig } from "@/config/useConfig";
 import { UsersTypes } from "@/globle";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { Grid, TextField } from "@mui/material";
