@@ -34,7 +34,7 @@ const Navbar = () => {
       path: PATHS.document,
     },
     {
-      name: "Form",
+      name: "ScrollProgress",
       path: PATHS.form,
     },
   ];

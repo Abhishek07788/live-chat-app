@@ -145,7 +145,7 @@ const Chatting = ({ roomId }: { roomId: string }) => {
         <ChatBody allMessages={allMessages} ref={listRef} />
 
         {/* footer --- */}
-        {room?.blocked?.includes(currentUser._id) ? (
+        {room?.blocked?.includes(currentUser._id) && otherUser ? (
           <Alert severity="error">
             {otherUser.name} has blocked you from the chat!
           </Alert>
