@@ -11,7 +11,7 @@ const app = express();
 const server = require("http").createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_API_KEY, // Removed trailing slash
+    origin: process.env.FRONTEND_API_KEY, // Removed trailing
   },
 });
 
