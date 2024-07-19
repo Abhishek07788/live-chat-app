@@ -3,7 +3,7 @@ first clone the project ``git clone https://github.com/Abhishek07788/live-chat-a
 
 Start Frontend:
 
-step1: go to frontend folder directory ``cd frontned``
+step1: go to frontend folder directory ``cd frontend``
 
 step2: install node_modules ``npm install``
 
